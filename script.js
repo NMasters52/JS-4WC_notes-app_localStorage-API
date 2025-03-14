@@ -55,12 +55,14 @@ function loadNotes() {
     });
 };
 
+//delelte btn logic
 function handleDelete(event) {
     const target = event.target;
 
     if (target.classList.contains("deleteBtn")) {
         const noteId = parseInt(target.dataset.id);
 
+        //check if the id is a number, filter the note with the event targeted id, and push the new filter array
         if (!isNaN(noteId)) { //check to make sure noteId is a number.
             let notes = JSON.parse(localStorage.getItem("notes") || '[]');
             notes = notes.filter(note => note.id !== noteId);
