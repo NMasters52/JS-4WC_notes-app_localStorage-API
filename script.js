@@ -7,7 +7,7 @@ const elements = {
 //create a way to save the textinput into local storage
 
 function saveNote() {
-    //grab the value of the new note
+    //grab the value of the new note and trim extra whitespace
     const noteText = elements.textInput.value.trim();
 
     //grab existing notes 
@@ -16,21 +16,22 @@ function saveNote() {
     //create structure to be saved
    const newNote = {
     id: Date.now(),
-    text: noteText
+    text: noteText,
    };
 
-   //push new note to the existing array of notes
+   //push new note to make a new array of notes 
    notes.unshift(newNote);
-//save the new note to storage
- localStorage.setItem('notes', JSON.stringify(notes));
+    //save the new array to storage
+    localStorage.setItem('notes', JSON.stringify(notes));
 
-
+ //load new locally stored array
  loadNotes();
 }
 
 
 function initializeApp() {
     elements.saveNote.addEventListener('click', saveNote);
+    elements.displayNotes.addEventListener('click', handleDelete);
 }
 
 function loadNotes() {
@@ -46,17 +47,30 @@ function loadNotes() {
         return;
     }
 
-    //iterate over the notes 
+    //iterate over the notes to render the HTML to the client side 
     notes.forEach(note => {
         elements.displayNotes.innerHTML += `
-            <p>${note.text}</p>
-        `
+            <p>Note id: ${note.id} | ${note.text} | <button class="deleteBtn" data-id=${note.id}>X</button> </p>`;
         
     });
-
-
-    
 };
+
+function handleDelete(event) {
+    const target = event.target;
+
+    if (target.classList.contains("deleteBtn")) {
+        const noteId = parseInt(target.dataset.id);
+
+        if (!isNaN(noteId)) { //check to make sure noteId is a number.
+            let notes = JSON.parse(localStorage.getItem("notes") || '[]');
+            notes = notes.filter(note => note.id !== noteId);
+            localStorage.setItem("notes", JSON.stringify(notes));
+            loadNotes();
+        }
+    } else {
+        elements.displayNotes.innerText = "no notes saved";
+    }
+}
 
 initializeApp();
 loadNotes();
